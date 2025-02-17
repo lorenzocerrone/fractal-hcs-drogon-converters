@@ -109,7 +109,6 @@ def convert_hcs_drogon_init_task(
     parallelization_list = build_parallelization_list(
         zarr_dir=zarr_dir,
         tiled_images=tiled_images,
-        pixel_size_um=pixel_size_um,
         overwrite=overwrite,
         advanced_options=advanced_options,
     )
