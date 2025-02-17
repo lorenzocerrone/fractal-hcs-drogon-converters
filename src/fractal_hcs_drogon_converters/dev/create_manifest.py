@@ -21,7 +21,7 @@ custom_pydantic_models = [
 if __name__ == "__main__":
     PACKAGE = "fractal_hcs_drogon_converters"
     AUTHORS = "Lorenzo Cerrone"
-    docs_link = ""
+    docs_link = "https://github.com/lorenzocerrone/fractal-hcs-drogon-converters"
     create_manifest(
         package=PACKAGE,
         authors=AUTHORS,

@@ -8,7 +8,7 @@
       "tags": [
         "Plate converter"
       ],
-      "docs_info": "### Purpose\n- Convert a Drogon Plate to a OME-Zarr Plate.\n\n### Outputs\n- A OME-Zarr Plate.\n\n### Limitations\n- This task is tailored to a specific Drogon acquisition. It may not work on all Drogon acquisitions.\n- This converter requires additonal metadata to work properly. This metadata is not present in all Drogon acquisitions, and needs to be added manually.\n\nPurpose\nConvert a Leica LIF plate to a OME-Zarr Plate.\nOutputs\nA OME-Zarr Plate.\nLimitations\nThis task has been tested on a limited set of acquisitions. It may not work on all Leica LIF acquisitions.\nThis converter is does not support images exported in auto-saved mode.",
+      "docs_info": "### Purpose\n\n- Convert a Drogon Plate to a OME-Zarr Plate.\n\n### Outputs\n\n- A OME-Zarr Plate.\n\n### Limitations\n\n- This task is tailored to a specific Drogon acquisition. It may not work on all Drogon acquisitions.\n- This converter requires additonal metadata to work properly. This metadata is not present in all Drogon acquisitions, and needs to be added manually.",
       "executable_non_parallel": "convert_hcs_drogon_init_task.py",
       "executable_parallel": "convert_hcs_drogon_compute_task.py",
       "meta_non_parallel": {
@@ -28,7 +28,8 @@
                 "default": 5,
                 "minimum": 1,
                 "title": "Num Levels",
-                "type": "integer"
+                "type": "integer",
+                "description": "The number of resolution levels in the pyramid."
               },
               "tiling_mode": {
                 "default": "auto",
@@ -39,74 +40,85 @@
                   "none"
                 ],
                 "title": "Tiling Mode",
-                "type": "string"
+                "type": "string",
+                "description": "Specify the tiling mode. \"auto\" will automatically determine the tiling mode. \"grid\" if the input data is a grid, it will be tiled using snap-to-grid. \"free\" will remove any overlap between tiles using a snap-to-corner approach. \"none\" will write the positions as is, using the microscope metadata."
               },
               "swap_xy": {
                 "default": false,
                 "title": "Swap Xy",
-                "type": "boolean"
+                "type": "boolean",
+                "description": "Swap x and y axes coordinates in the metadata. This is sometimes necessary to ensure correct image tiling and registration."
               },
               "invert_x": {
                 "default": false,
                 "title": "Invert X",
-                "type": "boolean"
+                "type": "boolean",
+                "description": "Invert x axis coordinates in the metadata. This is sometimes necessary to ensure correct image tiling and registration."
               },
               "invert_y": {
                 "default": false,
                 "title": "Invert Y",
-                "type": "boolean"
+                "type": "boolean",
+                "description": "Invert y axis coordinates in the metadata. This is sometimes necessary to ensure correct image tiling and registration."
               },
               "max_xy_chunk": {
                 "default": 4096,
                 "minimum": 1,
                 "title": "Max Xy Chunk",
-                "type": "integer"
+                "type": "integer",
+                "description": "XY chunk size is set as the minimum of this value and the microscope tile size."
               },
               "z_chunk": {
                 "default": 10,
                 "minimum": 1,
                 "title": "Z Chunk",
-                "type": "integer"
+                "type": "integer",
+                "description": "Z chunk size."
               },
               "c_chunk": {
                 "default": 1,
                 "minimum": 1,
                 "title": "C Chunk",
-                "type": "integer"
+                "type": "integer",
+                "description": "C chunk size."
               },
               "t_chunk": {
                 "default": 1,
                 "minimum": 1,
                 "title": "T Chunk",
-                "type": "integer"
+                "type": "integer",
+                "description": "T chunk size."
               }
             },
             "title": "AdvancedOptions",
             "type": "object"
           },
-          "DrgonPlateInputModel": {
+          "DrogonPlateInputModel": {
             "description": "Acquisition metadata.",
             "properties": {
               "path": {
                 "title": "Path",
-                "type": "string"
+                "type": "string",
+                "description": "Path to the Drgon acquisition."
               },
               "plate_name": {
                 "title": "Plate Name",
-                "type": "string"
+                "type": "string",
+                "description": "Optional name of the plate. If not provided, the plate name will be inferred from the lif file + scan name. If the tile scan name is not provided, this field can not be used."
               },
               "acquisition_id": {
                 "default": 0,
                 "minimum": 0,
                 "title": "Acquisition Id",
-                "type": "integer"
+                "type": "integer",
+                "description": "Acquisition ID, used to identify multiple rounds of acquisitions for the same plate. If tile_scan_name is not provided, this field can not be used."
               }
             },
             "required": [
               "path",
               "plate_name"
             ],
-            "title": "DrgonPlateInputModel",
+            "title": "DrogonPlateInputModel",
             "type": "object"
           }
         },
@@ -127,7 +139,7 @@
           },
           "acquisitions": {
             "items": {
-              "$ref": "#/$defs/DrgonPlateInputModel"
+              "$ref": "#/$defs/DrogonPlateInputModel"
             },
             "title": "Acquisitions",
             "type": "array",
@@ -289,7 +301,8 @@
         ],
         "type": "object",
         "title": "ConvertHcsDrogonComputeTask"
-      }
+      },
+      "docs_link": "https://github.com/lorenzocerrone/fractal-hcs-drogon-converters"
     }
   ],
   "has_args_schemas": true,
