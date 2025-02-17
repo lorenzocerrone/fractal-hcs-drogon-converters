@@ -5,11 +5,26 @@ to the package manifest.
 
 from fractal_tasks_core.dev.create_manifest import create_manifest
 
+custom_pydantic_models = [
+    (
+        "fractal_hcs_drogon_converters",
+        "convert_hcs_drogon_init_task.py",
+        "DrogonPlateInputModel",
+    ),
+    (
+        "fractal_hcs_drogon_converters",
+        "convert_hcs_drogon_init_task.py",
+        "AdvancedOptions",
+    ),
+]
+
 if __name__ == "__main__":
     PACKAGE = "fractal_hcs_drogon_converters"
     AUTHORS = "Lorenzo Cerrone"
     docs_link = ""
-    if docs_link:
-        create_manifest(package=PACKAGE, authors=AUTHORS, docs_link=docs_link)
-    else:
-        create_manifest(package=PACKAGE, authors=AUTHORS)
+    create_manifest(
+        package=PACKAGE,
+        authors=AUTHORS,
+        docs_link=docs_link,
+        custom_pydantic_models=custom_pydantic_models,
+    )

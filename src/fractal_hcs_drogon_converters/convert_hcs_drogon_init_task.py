@@ -15,7 +15,7 @@ from fractal_hcs_drogon_converters.parser import parse_drogon_metadata
 logger = logging.getLogger(__name__)
 
 
-class DrgonPlateInputModel(BaseModel):
+class DrogonPlateInputModel(BaseModel):
     """Acquisition metadata.
 
     Attributes:
@@ -67,7 +67,7 @@ def convert_hcs_drogon_init_task(
     zarr_urls: list[str],
     zarr_dir: str,
     # Task parameters
-    acquisitions: list[DrgonPlateInputModel],
+    acquisitions: list[DrogonPlateInputModel],
     cellline_layout_path: str,
     pixel_size_um: float = 0.325,
     overwrite: bool = False,
@@ -99,6 +99,7 @@ def convert_hcs_drogon_init_task(
             csv_path=path_cellline_layout,
             acquisition_id=acquisition.acquisition_id,
             plate_name=acquisition.plate_name,
+            pixel_size_um=pixel_size_um,
         )
 
         tiled_images.extend(_tiled_images)

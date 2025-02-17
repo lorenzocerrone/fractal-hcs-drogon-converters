@@ -126,6 +126,7 @@ def parse_drogon_metadata(
     csv_path: Path,
     acquisition_id: int = 0,
     plate_name: str = "test",
+    pixel_size_um: float = 0.325,
 ) -> list[TiledImage]:
     channel_dict = find_channels_meta(acquisition_path)
 
@@ -153,7 +154,7 @@ def parse_drogon_metadata(
         tile = Tile(
             top_l=Point(0, 0, 0, 0, 0),
             diag=Vector(shape_x, shape_y, 1, c=shape_c, t=1),
-            pixel_size=PixelSize(x=0.325, y=0.325, z=1),
+            pixel_size=PixelSize(pixel_size_um, pixel_size_um, z=1),
             space=TileSpace.PIXEL,
             data_loader=tiff_loader,
         )
