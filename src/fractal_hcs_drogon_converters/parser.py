@@ -151,11 +151,11 @@ def parse_drogon_metadata(
             channel_names=list(channel_dict.values()),
         )
         _, shape_c, _, shape_y, shape_x = tiff_loader.tile_shape
+        shape_x, shape_y = shape_x * pixel_size_um, shape_y * pixel_size_um
         tile = Tile(
             top_l=Point(0, 0, 0, 0, 0),
             diag=Vector(shape_x, shape_y, 1, c=shape_c, t=1),
-            pixel_size=PixelSize(pixel_size_um, pixel_size_um, z=1),
-            space=TileSpace.PIXEL,
+            pixel_size=PixelSize(x=pixel_size_um, y=pixel_size_um, z=1),
             data_loader=tiff_loader,
         )
         tiled_image.add_tile(tile)

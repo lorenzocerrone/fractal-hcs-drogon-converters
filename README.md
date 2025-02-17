@@ -1,7 +1,42 @@
 # fractal-hcs-drogon-converters
 
-Package description.
+## Local installation
 
-## Development instructions
+* Clone the repository
+* Install the dependencies
 
-Specific instructions on how to install your package, managing your environment, versioning and more can be found in the [DEVELOPERS_GUIDE](https://github.com/fractal-analytics-platform/fractal-tasks-template/blob/main/DEVELOPERS_GUIDE.md).
+```bash
+pip install -e .
+```
+
+## Sample usage (in python)
+
+```python
+from fractal_hcs_drogon_converters.convert_hcs_drogon_compute_task import (
+    convert_hcs_drogon_compute_task,
+)
+from fractal_hcs_drogon_converters.convert_hcs_drogon_init_task import (
+    DrogonPlateInputModel,
+    convert_hcs_drogon_init_task,
+)
+
+csv_path = "/Users/locerr/data/20250217_testdata_manuel/cellline_layout.csv"
+acquisition_path = "/Users/locerr/data/20250217_testdata_manuel/D2_R1"
+
+parallelization_list = convert_hcs_drogon_init_task(
+    zarr_urls=[],
+    zarr_dir="output-ome-zarr",
+    acquisitions=[DrogonPlateInputModel(
+        path=acquisition_path,
+        plate_name="Day2",
+        acquisition_id=0)
+    ],
+    cellline_layout_path=csv_path,
+    overwrite=True
+)
+
+
+for parallel_kwargs in parallelization_list["parallelization_list"]:
+    convert_hcs_drogon_compute_task(zarr_url=parallel_kwargs["zarr_url"],
+                                    init_args=parallel_kwargs["init_args"])
+```

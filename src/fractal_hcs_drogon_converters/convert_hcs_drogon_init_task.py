@@ -85,6 +85,9 @@ def convert_hcs_drogon_init_task(
         overwrite (bool): Overwrite existing Zarr files.
         advanced_options (AdvancedOptions): Advanced options for the conversion.
     """
+    zarr_dir = Path(zarr_dir)
+    zarr_dir.mkdir(parents=True, exist_ok=True)
+    
     path_cellline_layout = Path(cellline_layout_path)
     if not path_cellline_layout.exists():
         raise FileNotFoundError(f"Path {path_cellline_layout} does not exist.")
@@ -110,9 +113,9 @@ def convert_hcs_drogon_init_task(
         zarr_dir=zarr_dir,
         tiled_images=tiled_images,
         overwrite=overwrite,
-        advanced_options=advanced_options,
+        advanced_compute_options=advanced_options,
     )
-    initiate_ome_zarr_plates(zarr_urls=zarr_urls, tiled_images=tiled_images)
+    initiate_ome_zarr_plates(zarr_dir=zarr_dir, tiled_images=tiled_images, overwrite=overwrite)
     logger.info(f"Initialized {len(parallelization_list)} parallelization tasks.")
     return {"parallelization_list": parallelization_list}
 
