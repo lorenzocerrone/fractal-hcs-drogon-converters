@@ -22,12 +22,14 @@ from fractal_hcs_drogon_converters.convert_hcs_drogon_init_task import (
 
 csv_path = "/Users/locerr/data/20250217_testdata_manuel/cellline_layout.csv"
 acquisition_path = "/Users/locerr/data/20250217_testdata_manuel/D2_R1"
+yaml_name = "name.yaml"
 
 parallelization_list = convert_hcs_drogon_init_task(
     zarr_urls=[],
     zarr_dir="output-ome-zarr",
     acquisitions=[DrogonPlateInputModel(
         path=acquisition_path,
+        yaml=yaml_name
         plate_name="Day2",
         acquisition_id=0)
     ],
