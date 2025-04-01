@@ -149,6 +149,7 @@ def parse_drogon_metadata(
                 acquisition_id=acquisition_id,
             ),
             channel_names=list(channel_dict.values()),
+            # add cell_line {"cell_line": well_info["cell_line"]}
         )
         _, shape_c, _, shape_y, shape_x = tiff_loader.tile_shape
         shape_x, shape_y = shape_x * pixel_size_um, shape_y * pixel_size_um
