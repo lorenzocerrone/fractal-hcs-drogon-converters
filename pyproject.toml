@@ -25,6 +25,7 @@ authors = [{ name = "Lorenzo Cerrone", email = "lorenzo.cerrone@uzh.ch" }]
 # Required Python version and dependencies
 requires-python = ">=3.11"
 dependencies = [
+    "numcodecs<0.16",
     "fractal-converters-tools==0.4.0",
     "ngio==0.1.6",
     "tifffile",

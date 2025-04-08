@@ -99,7 +99,12 @@
               "path": {
                 "title": "Path",
                 "type": "string",
-                "description": "Path to the Drgon acquisition."
+                "description": "Path to the Drogon acquisition."
+              },
+              "yaml": {
+                "title": "Yaml",
+                "type": "string",
+                "description": "Corresponding yaml name within acquistion folder. Specfic for Batch and Round, indicating channel - staining relation. "
               },
               "plate_name": {
                 "title": "Plate Name",
@@ -116,6 +121,7 @@
             },
             "required": [
               "path",
+              "yaml",
               "plate_name"
             ],
             "title": "DrogonPlateInputModel",

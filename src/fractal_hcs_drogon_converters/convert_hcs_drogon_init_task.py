@@ -19,7 +19,9 @@ class DrogonPlateInputModel(BaseModel):
     """Acquisition metadata.
 
     Attributes:
-        path (str): Path to the Drgon acquisition.
+        path (str): Path to the Drogon acquisition.
+        yaml (str): Corresponding yaml name within acquistion folder. 
+            Specfic for Batch and Round, indicating channel - staining relation. 
         plate_name (str): Optional name of the plate.
             If not provided, the plate name will be inferred from the
             lif file + scan name.
@@ -31,6 +33,7 @@ class DrogonPlateInputModel(BaseModel):
     """
 
     path: str
+    yaml: str
     plate_name: str
     acquisition_id: int = Field(default=0, ge=0)
 
@@ -100,6 +103,7 @@ def convert_hcs_drogon_init_task(
         _tiled_images = parse_drogon_metadata(
             acquisition_path=Path(acquisition.path),
             csv_path=path_cellline_layout,
+            yaml_name=acquisition.yaml, 
             acquisition_id=acquisition.acquisition_id,
             plate_name=acquisition.plate_name,
             pixel_size_um=pixel_size_um,

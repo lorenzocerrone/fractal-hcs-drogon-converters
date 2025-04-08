@@ -9,22 +9,31 @@ from fractal_converters_tools.tiled_image import PlatePathBuilder, TiledImage
 from ngio.ngff_meta.fractal_image_meta import PixelSize
 
 
-def find_channels_meta(acquisition_path: Path) -> dict[str, str]:
-    # find all .yaml and .yml files in the acquisition folder
-    yaml_files_path = list(acquisition_path.glob("*.yml")) + list(
-        acquisition_path.glob("*.yaml")
-    )
-    if len(yaml_files_path) == 0:
-        raise FileNotFoundError(
-            "No channel metadata yaml file found in the acquisition folder"
-        )
+def find_channels_meta(
+    acquisition_path: Path,
+    yaml_name: str,
+) -> dict[str, str]:
 
-    if len(yaml_files_path) > 1:
-        raise FileNotFoundError(
-            "Multiple channel metadata yaml files found in the acquisition folder"
-        )
+    # Get path from user set yaml file 
+    yaml_file_path = Path(acquisition_path)/yaml_name
 
-    yaml_file_path = yaml_files_path[0]
+    if not yaml_file_path.exists():
+        raise FileNotFoundError(f"Path {yaml_file_path} does not exist. Could not read channel yaml.")
+
+    # # find all .yaml and .yml files in the acquisition folder (uncomment in the case we have same stain for all plate sections)
+    # yaml_files_path = list(acquisition_path.glob("*.yml")) + list(
+    #     acquisition_path.glob("*.yaml")
+    # )
+    # if len(yaml_files_path) == 0:
+    #     raise FileNotFoundError(
+    #         "No channel metadata yaml file found in the acquisition folder"
+    #     )
+
+    # if len(yaml_files_path) > 1:
+    #     raise FileNotFoundError(
+    #         "Multiple channel metadata yaml files found in the acquisition folder"
+    #     )
+
     with open(yaml_file_path, "r") as file:
         yaml_data = yaml.load(file, Loader=yaml.SafeLoader)
     return yaml_data
@@ -124,11 +133,12 @@ class TiffLoader:
 def parse_drogon_metadata(
     acquisition_path: Path,
     csv_path: Path,
+    yaml_name: str,
     acquisition_id: int = 0,
     plate_name: str = "test",
     pixel_size_um: float = 0.325,
 ) -> list[TiledImage]:
-    channel_dict = find_channels_meta(acquisition_path)
+    channel_dict = find_channels_meta(acquisition_path,yaml_name)
 
     tiff_base_path = acquisition_path / "TIF_OVR_MIP"
     tiff_files = find_tiff_files(tiff_base_path)
