@@ -118,6 +118,13 @@
                 "title": "Acquisition Id",
                 "type": "integer",
                 "description": "Acquisition ID, used to identify multiple rounds of acquisitions for the same plate. If tile_scan_name is not provided, this field can not be used."
+              },
+              "time_point": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Time Point",
+                "type": "integer",
+                "description": "Time point of the acquisition in days."
               }
             },
             "required": [
