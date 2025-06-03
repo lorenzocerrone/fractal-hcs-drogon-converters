@@ -29,9 +29,11 @@ parallelization_list = convert_hcs_drogon_init_task(
     zarr_dir="output-ome-zarr",
     acquisitions=[DrogonPlateInputModel(
         path=acquisition_path,
-        yaml=yaml_name
+        yaml=yaml_name,
         plate_name="Day2",
-        acquisition_id=0)
+        acquisition_id=0,
+        time_point=2
+    )
     ],
     cellline_layout_path=csv_path,
     overwrite=True
