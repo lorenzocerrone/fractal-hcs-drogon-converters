@@ -20,7 +20,8 @@ def find_channels_meta(
             f"Path {yaml_file_path} does not exist. Could not read channel yaml."
         )
 
-    # # find all .yaml and .yml files in the acquisition folder (uncomment in the case we have same stain for all plate sections)
+    # # find all .yaml and .yml files in the acquisition folder (uncomment in the
+    # case we have same stain for all plate sections)
     # yaml_files_path = list(acquisition_path.glob("*.yml")) + list(
     #     acquisition_path.glob("*.yaml")
     # )
@@ -34,7 +35,7 @@ def find_channels_meta(
     #         "Multiple channel metadata yaml files found in the acquisition folder"
     #     )
 
-    with open(yaml_file_path, "r") as file:
+    with open(yaml_file_path) as file:
         yaml_data = yaml.load(file, Loader=yaml.SafeLoader)
     return yaml_data
 
@@ -54,7 +55,8 @@ def load_cell_line_layout(csv_path):
             well = f"{row}{column}"
             if well in cell_line_layout:
                 raise ValueError(
-                    f"Duplicate well {well}, each well should only be present once in the cell line csv"
+                    f"Duplicate well {well}, each well should only be present "
+                    "once in the cell line csv"
                 )
             cell_line_layout[well] = {
                 "row": row,
@@ -137,6 +139,7 @@ def parse_drogon_metadata(
     acquisition_id: int = 0,
     plate_name: str = "test",
     pixel_size_um: float = 0.325,
+    time_point: int = 0,
 ) -> list[TiledImage]:
     channel_dict = find_channels_meta(acquisition_path, yaml_name)
 
@@ -159,7 +162,10 @@ def parse_drogon_metadata(
                 acquisition_id=acquisition_id,
             ),
             channel_names=list(channel_dict.values()),
-            # add cell_line {"cell_line": well_info["cell_line"]}
+            attributes={
+                "cell_line": well_info["cell_line"],
+                "time_point": str(time_point),
+            },
         )
         _, shape_c, _, shape_y, shape_x = tiff_loader.tile_shape
         shape_x, shape_y = shape_x * pixel_size_um, shape_y * pixel_size_um

@@ -30,12 +30,14 @@ class DrogonPlateInputModel(BaseModel):
         acquisition_id: Acquisition ID, used to identify multiple rounds
             of acquisitions for the same plate.
             If tile_scan_name is not provided, this field can not be used.
+        time_point (int): Time point of the acquisition in days.
     """
 
     path: str
     yaml: str
     plate_name: str
     acquisition_id: int = Field(default=0, ge=0)
+    time_point: int = Field(default=0, ge=0)
 
 
 class AdvancedOptions(AdvancedComputeOptions):
@@ -106,6 +108,7 @@ def convert_hcs_drogon_init_task(
             acquisition_id=acquisition.acquisition_id,
             plate_name=acquisition.plate_name,
             pixel_size_um=pixel_size_um,
+            time_point=acquisition.time_point,
         )
 
         tiled_images.extend(_tiled_images)
