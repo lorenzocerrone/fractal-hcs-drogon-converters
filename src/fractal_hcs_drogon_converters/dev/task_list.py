@@ -1,9 +1,24 @@
 """Contains the list of tasks available to fractal."""
 
-from fractal_tasks_core.dev.task_models import CompoundTask
+from fractal_task_tools.task_models import ConverterCompoundTask
+
+AUTHORS = "Fractal Core Team"
+DOCS_LINK = "https://github.com/lorenzocerrone/fractal-hcs-drogon-converters"
+INPUT_MODELS = [
+    (
+        "fractal_hcs_drogon_converters",
+        "convert_hcs_drogon_init_task.py",
+        "DrogonPlateInputModel",
+    ),
+    (
+        "fractal_hcs_drogon_converters",
+        "convert_hcs_drogon_init_task.py",
+        "AdvancedOptions",
+    ),
+]
 
 TASK_LIST = [
-    CompoundTask(
+    ConverterCompoundTask(
         name="Convert HCS Drogon Plate to OME-Zarr",
         executable_init="convert_hcs_drogon_init_task.py",
         executable="convert_hcs_drogon_compute_task.py",

@@ -3,14 +3,14 @@
 import logging
 from pathlib import Path
 
-from fractal_converters_tools.omezarr_plate_writers import initiate_ome_zarr_plates
-from fractal_converters_tools.task_common_models import (
+from fractal_converters_tools import (
     AdvancedComputeOptions,
+    build_parallelization_list,
+    initiate_ome_zarr_plates,
 )
-from fractal_converters_tools.task_init_tools import build_parallelization_list
 from pydantic import BaseModel, Field, validate_call
 
-from fractal_hcs_drogon_converters.parser import parse_drogon_metadata
+from fractal_hcs_drogon_converters._parser import parse_drogon_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +20,8 @@ class DrogonPlateInputModel(BaseModel):
 
     Attributes:
         path (str): Path to the Drogon acquisition.
-        yaml (str): Corresponding yaml name within acquistion folder. 
-            Specfic for Batch and Round, indicating channel - staining relation. 
+        yaml (str): Corresponding yaml name within acquistion folder.
+            Specfic for Batch and Round, indicating channel - staining relation.
         plate_name (str): Optional name of the plate.
             If not provided, the plate name will be inferred from the
             lif file + scan name.
@@ -30,12 +30,14 @@ class DrogonPlateInputModel(BaseModel):
         acquisition_id: Acquisition ID, used to identify multiple rounds
             of acquisitions for the same plate.
             If tile_scan_name is not provided, this field can not be used.
+        time_point (int): Time point of the acquisition in days.
     """
 
     path: str
     yaml: str
     plate_name: str
     acquisition_id: int = Field(default=0, ge=0)
+    time_point: int = Field(default=0, ge=0)
 
 
 class AdvancedOptions(AdvancedComputeOptions):
@@ -67,7 +69,6 @@ class AdvancedOptions(AdvancedComputeOptions):
 def convert_hcs_drogon_init_task(
     *,
     # Fractal parameters
-    zarr_urls: list[str],
     zarr_dir: str,
     # Task parameters
     acquisitions: list[DrogonPlateInputModel],
@@ -88,9 +89,9 @@ def convert_hcs_drogon_init_task(
         overwrite (bool): Overwrite existing Zarr files.
         advanced_options (AdvancedOptions): Advanced options for the conversion.
     """
-    zarr_dir = Path(zarr_dir)
-    zarr_dir.mkdir(parents=True, exist_ok=True)
-    
+    zarr_dir_path = Path(zarr_dir)
+    zarr_dir_path.mkdir(parents=True, exist_ok=True)
+
     path_cellline_layout = Path(cellline_layout_path)
     if not path_cellline_layout.exists():
         raise FileNotFoundError(f"Path {path_cellline_layout} does not exist.")
@@ -103,10 +104,11 @@ def convert_hcs_drogon_init_task(
         _tiled_images = parse_drogon_metadata(
             acquisition_path=Path(acquisition.path),
             csv_path=path_cellline_layout,
-            yaml_name=acquisition.yaml, 
+            yaml_name=acquisition.yaml,
             acquisition_id=acquisition.acquisition_id,
             plate_name=acquisition.plate_name,
             pixel_size_um=pixel_size_um,
+            time_point=acquisition.time_point,
         )
 
         tiled_images.extend(_tiled_images)
@@ -114,18 +116,20 @@ def convert_hcs_drogon_init_task(
     logger.info(f"Found {len(tiled_images)} tiled images.")
 
     parallelization_list = build_parallelization_list(
-        zarr_dir=zarr_dir,
+        zarr_dir=zarr_dir_path,
         tiled_images=tiled_images,
         overwrite=overwrite,
         advanced_compute_options=advanced_options,
     )
-    initiate_ome_zarr_plates(zarr_dir=zarr_dir, tiled_images=tiled_images, overwrite=overwrite)
+    initiate_ome_zarr_plates(
+        zarr_dir=zarr_dir_path, tiled_images=tiled_images, overwrite=overwrite
+    )
     logger.info(f"Initialized {len(parallelization_list)} parallelization tasks.")
     return {"parallelization_list": parallelization_list}
 
 
 if __name__ == "__main__":
-    from fractal_tasks_core.tasks._utils import run_fractal_task
+    from fractal_task_tools.task_wrapper import run_fractal_task
 
     run_fractal_task(
         task_function=convert_hcs_drogon_init_task, logger_name=logger.name

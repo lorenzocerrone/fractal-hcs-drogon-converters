@@ -4,23 +4,24 @@ import numpy as np
 import pandas
 import tifffile
 import yaml
-from fractal_converters_tools.tile import Point, Tile, TileSpace, Vector
-from fractal_converters_tools.tiled_image import PlatePathBuilder, TiledImage
-from ngio.ngff_meta.fractal_image_meta import PixelSize
+from fractal_converters_tools import PlatePathBuilder, Point, Tile, TiledImage, Vector
+from ngio import PixelSize
 
 
 def find_channels_meta(
     acquisition_path: Path,
     yaml_name: str,
 ) -> dict[str, str]:
-
-    # Get path from user set yaml file 
-    yaml_file_path = Path(acquisition_path)/yaml_name
+    # Get path from user set yaml file
+    yaml_file_path = Path(acquisition_path) / yaml_name
 
     if not yaml_file_path.exists():
-        raise FileNotFoundError(f"Path {yaml_file_path} does not exist. Could not read channel yaml.")
+        raise FileNotFoundError(
+            f"Path {yaml_file_path} does not exist. Could not read channel yaml."
+        )
 
-    # # find all .yaml and .yml files in the acquisition folder (uncomment in the case we have same stain for all plate sections)
+    # # find all .yaml and .yml files in the acquisition folder (uncomment in the
+    # case we have same stain for all plate sections)
     # yaml_files_path = list(acquisition_path.glob("*.yml")) + list(
     #     acquisition_path.glob("*.yaml")
     # )
@@ -34,7 +35,7 @@ def find_channels_meta(
     #         "Multiple channel metadata yaml files found in the acquisition folder"
     #     )
 
-    with open(yaml_file_path, "r") as file:
+    with open(yaml_file_path) as file:
         yaml_data = yaml.load(file, Loader=yaml.SafeLoader)
     return yaml_data
 
@@ -46,7 +47,7 @@ def load_cell_line_layout(csv_path):
     cell_line_layout = {}
     for column in cellline_layout.columns:
         for row, cell_line in zip(
-            cellline_layout[column].index, cellline_layout[column]
+            cellline_layout[column].index, cellline_layout[column], strict=True
         ):
             int_column = int(column)
             if int_column < 10:
@@ -54,7 +55,8 @@ def load_cell_line_layout(csv_path):
             well = f"{row}{column}"
             if well in cell_line_layout:
                 raise ValueError(
-                    f"Duplicate well {well}, each well should only be present once in the cell line csv"
+                    f"Duplicate well {well}, each well should only be present "
+                    "once in the cell line csv"
                 )
             cell_line_layout[well] = {
                 "row": row,
@@ -106,17 +108,17 @@ class TiffLoader:
             with tifffile.TiffFile(self.tiff_paths[0]) as tif:
                 dimensions = tif.series[0].shape
             return (1, len(self.tiff_paths), 1, dimensions[1], dimensions[2])
-        except Exception as e:
+        except Exception as _:
             return self._open_tiff(self.tiff_paths[0]).shape
 
     @property
-    def dtype(self) -> np.dtype:
+    def dtype(self) -> str:
         """Return the dtype of the tiff files."""
         try:
             with tifffile.TiffFile(self.tiff_paths[0]) as tif:
-                return tif.series[0].dtype
-        except Exception as e:
-            return self._open_tiff(self.tiff_paths[0]).dtype
+                return str(tif.series[0].dtype)
+        except Exception:
+            return str(self._open_tiff(self.tiff_paths[0]).dtype)
 
     def load(self) -> np.ndarray:
         """Return the full tile."""
@@ -137,8 +139,9 @@ def parse_drogon_metadata(
     acquisition_id: int = 0,
     plate_name: str = "test",
     pixel_size_um: float = 0.325,
+    time_point: int = 0,
 ) -> list[TiledImage]:
-    channel_dict = find_channels_meta(acquisition_path,yaml_name)
+    channel_dict = find_channels_meta(acquisition_path, yaml_name)
 
     tiff_base_path = acquisition_path / "TIF_OVR_MIP"
     tiff_files = find_tiff_files(tiff_base_path)
@@ -159,7 +162,10 @@ def parse_drogon_metadata(
                 acquisition_id=acquisition_id,
             ),
             channel_names=list(channel_dict.values()),
-            # add cell_line {"cell_line": well_info["cell_line"]}
+            attributes={
+                "cell_line": well_info["cell_line"],
+                "time_point": str(time_point),
+            },
         )
         _, shape_c, _, shape_y, shape_x = tiff_loader.tile_shape
         shape_x, shape_y = shape_x * pixel_size_um, shape_y * pixel_size_um

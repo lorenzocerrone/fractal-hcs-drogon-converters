@@ -3,8 +3,7 @@
 import logging
 import time
 
-from fractal_converters_tools.task_common_models import ConvertParallelInitArgs
-from fractal_converters_tools.task_compute_tools import generic_compute_task
+from fractal_converters_tools import ConvertParallelInitArgs, generic_compute_task
 from pydantic import validate_call
 
 logger = logging.getLogger(__name__)
@@ -35,7 +34,7 @@ def convert_hcs_drogon_compute_task(
 
 
 if __name__ == "__main__":
-    from fractal_tasks_core.tasks._utils import run_fractal_task
+    from fractal_task_tools.task_wrapper import run_fractal_task
 
     run_fractal_task(
         task_function=convert_hcs_drogon_compute_task, logger_name=logger.name
